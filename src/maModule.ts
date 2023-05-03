@@ -105,9 +105,35 @@ export async function maTablePromiseVersion() {
 }
 
 export function bigNumberArray(length: number): number[] {
-        let bigArray: number[] = Array < number > (length);
-        for (let i = 0; i < length; i++) {
-            bigArray[i] = i;
-        }
-        return bigArray;
+    let bigArray: number[] = Array < number > (length);
+    for (let i = 0; i < length; i++) {
+        bigArray[i] = i;
     }
+    return bigArray;
+}
+
+export async function findNumber(array: number[], number: number){
+    let promises: Promise<boolean>[] = array.map((value) => {
+        const promise: Promise<any> = new Promise((resolve, reject) => {
+            // resolve if value is even, reject if odd
+            if (value === number) {
+                resolve(null);
+            } else {
+                reject(null);
+            }
+        });
+        return promise.then(() => true, () => false);
+    });
+    // wait for all promises to resolve, then return the index of the resolved promise with true value
+    return await Promise.all(promises).then((results) => {
+        let index: number = -1;
+        results.forEach((value, i) => {
+            if (value) {
+                index = i;
+            }
+        });
+        return index;
+
+    }).catch((err) => console.log(err));
+}
+
