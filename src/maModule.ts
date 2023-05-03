@@ -25,15 +25,79 @@ export async function maPromise(): Promise<void> {
     console.log(`Double Number: ${number * 2}`);
 }
 
-export function maTableCallbackVersion() {
+export function maTableCallbackVersion(callback: (err: any, value: any) => void) {
     console.log("Using callback version:");
 
     // Open a new SQLite database connection
     const db = new sqlite3.Database(':memory:', () => console.log(" db opened."));
+    db.serialize(() => {
+        try {
+            // Run a SQL query to create a table called "maTable"
+            db.run('CREATE TABLE maTable (id INTEGER PRIMARY KEY, name TEXT)', () => console.log("  table created."));
 
-// Run a SQL query to create a table called "maTable"
-    db.run('CREATE TABLE maTable (id INTEGER PRIMARY KEY, name TEXT)', () => console.log("  table created."));
+            // Close the database connection
+            db.close(() => {
+                console.log("    db closed.");
+                callback(null, null);
+            });
+            // throw an error on purpose
+            throw new Error("Error");
+        } catch (err) {
+            callback(err, null)
+        }
 
-// Close the database connection
-    db.close(() => console.log("    db closed."));
+    });
+
+}
+
+
+export async function maTablePromiseVersion() {
+    console.log("Using promise version:");
+
+    function openDatabase(): Promise<sqlite3.Database> {
+        return new Promise((resolve, reject) => {
+            const db = new sqlite3.Database(':memory:', (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                console.log(" db opened.");
+                resolve(db);
+            });
+            return db;
+        });
+    }
+
+    function dbRunPromise(db: sqlite3.Database, sql: string, message: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            db.run(sql, (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                console.log(message);
+                resolve();
+            });
+        });
+    }
+
+    function dbClosePromise(db: sqlite3.Database): Promise<void> {
+        return new Promise((resolve, reject) => {
+            db.close((err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                console.log("    db closed.");
+                resolve();
+            });
+        });
+    }
+
+    const db = await openDatabase().catch((err) => console.log(err));
+    if (db) {
+        await dbRunPromise(db, 'CREATE TABLE maTable (id INTEGER PRIMARY KEY, name TEXT)', '  table created.').catch((err) => console.log(err));
+        await dbClosePromise(db).catch((err) => console.log(err));
+    }
+
 }
