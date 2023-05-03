@@ -34,6 +34,10 @@ async function main() {
     let number = 47;
     odd_numbers ? findNumber(odd_numbers,number).then(index => {if (index != -1) console.log(`Odd numbers, Index of ${number}: ` + index)}).catch((err) => console.log(err)) : console.log("odd_numbers is undefined");
     even_numbers ? findNumber(even_numbers,number).then(index => {if (index != -1) console.log(`Even numbers, index of ${number}: ` + index)}).catch((err) => console.log(err)) : console.log("even_numbers is undefined");
+
+    // use async generator function to iterate over array elements
+
+
 }
 
 main();
