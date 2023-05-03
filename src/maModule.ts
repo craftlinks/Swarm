@@ -100,4 +100,14 @@ export async function maTablePromiseVersion() {
         await dbClosePromise(db).catch((err) => console.log(err));
     }
 
+
+
 }
+
+export function bigNumberArray(length: number): number[] {
+        let bigArray: number[] = Array < number > (length);
+        for (let i = 0; i < length; i++) {
+            bigArray[i] = i;
+        }
+        return bigArray;
+    }

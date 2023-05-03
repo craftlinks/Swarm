@@ -16,6 +16,8 @@ async function main() {
     await maPromise();
     await maTablePromiseVersion();
     maTableCallbackVersionPromise().then(() => console.log("That's all folks!")).catch((err) => console.log("That's an error, Folks:\n" + err));
+
+
 }
 
 main();
